@@ -110,8 +110,8 @@ func StartDownloadingSegment(ctx context.Context, meta Meta) context.CancelFunc 
 	return cancel
 }
 
-func StartProcessingSegment(ctx context.Context, meta Meta) context.CancelFunc {
-	promCancel := prometheus.StartProcessingSegment()
+func StartProcessingSegment(ctx context.Context, meta Meta, preset string) context.CancelFunc {
+	promCancel := prometheus.StartProcessingSegment(preset)
 	nrCancel := newrelic.StartSegment(ctx, "Processing image", meta)
 	ddCancel := datadog.StartSpan(ctx, "processing_image", meta)
 	otelCancel := otel.StartSpan(ctx, "processing_image", meta)

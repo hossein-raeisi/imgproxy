@@ -72,7 +72,7 @@ func Init() {
 		Namespace: config.PrometheusNamespace,
 		Name:      "request_span_duration_seconds",
 		Help:      "A histogram of the queue latency.",
-	}, []string{"span"})
+	}, []string{"span", "preset"})
 
 	downloadDuration = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Namespace: config.PrometheusNamespace,
@@ -201,7 +201,7 @@ func StartQueueSegment() context.CancelFunc {
 		return func() {}
 	}
 
-	return startDuration(requestSpanDuration.With(prometheus.Labels{"span": "queue"}))
+	return startDuration(requestSpanDuration.With(prometheus.Labels{"span": "queue", "preset": "_"}))
 }
 
 func StartDownloadingSegment() context.CancelFunc {
@@ -209,7 +209,7 @@ func StartDownloadingSegment() context.CancelFunc {
 		return func() {}
 	}
 
-	cancel := startDuration(requestSpanDuration.With(prometheus.Labels{"span": "downloading"}))
+	cancel := startDuration(requestSpanDuration.With(prometheus.Labels{"span": "downloading", "preset": "_"}))
 	cancelLegacy := startDuration(downloadDuration)
 
 	return func() {
@@ -218,12 +218,12 @@ func StartDownloadingSegment() context.CancelFunc {
 	}
 }
 
-func StartProcessingSegment() context.CancelFunc {
+func StartProcessingSegment(preset string) context.CancelFunc {
 	if !enabled {
 		return func() {}
 	}
 
-	cancel := startDuration(requestSpanDuration.With(prometheus.Labels{"span": "processing"}))
+	cancel := startDuration(requestSpanDuration.With(prometheus.Labels{"span": "processing", "preset": preset}))
 	cancelLegacy := startDuration(processingDuration)
 
 	return func() {
@@ -237,7 +237,7 @@ func StartStreamingSegment() context.CancelFunc {
 		return func() {}
 	}
 
-	return startDuration(requestSpanDuration.With(prometheus.Labels{"span": "streaming"}))
+	return startDuration(requestSpanDuration.With(prometheus.Labels{"span": "streaming", "preset": "_"}))
 }
 
 func startDuration(m prometheus.Observer) context.CancelFunc {

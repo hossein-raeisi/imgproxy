@@ -454,7 +454,7 @@ func handleProcessing(reqID string, rw http.ResponseWriter, r *http.Request) {
 	resultData, err := func() (*imagedata.ImageData, error) {
 		defer metrics.StartProcessingSegment(ctx, metrics.Meta{
 			metrics.MetaProcessingOptions: metricsMeta[metrics.MetaProcessingOptions],
-		})()
+		}, strings.Join(po.UsedPresets, "-"))()
 		return processing.ProcessImage(ctx, originData, po)
 	}()
 	checkErr(ctx, "processing", err)
